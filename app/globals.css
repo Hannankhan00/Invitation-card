@@ -1,26 +1,117 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-serif-royal: var(--font-cinzel), serif;
+  --font-cursive: var(--font-great-vibes), cursive;
+  --font-sans-clean: var(--font-montserrat), sans-serif;
+  
+  --maroon-deep: #200408;
+  --maroon-rich: #420812;
+  --maroon-velvet: #5c0f1c;
+  --gold-pure: #d4af37;
+  --gold-light: #fbeea4;
+  --gold-deep: #a67c1e;
+  --cream-soft: #faf6ee;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans-clean);
+  background-color: var(--maroon-deep);
+  color: var(--cream-soft);
+  touch-action: pan-y;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.font-royal {
+  font-family: var(--font-serif-royal);
+}
+
+.font-script {
+  font-family: var(--font-cursive);
+}
+
+.font-body {
+  font-family: var(--font-sans-clean);
+}
+
+.font-times-bold {
+  font-family: "TimesNewRomanPS-BoldMT", "Times New Roman", Times, serif;
+  font-weight: 700;
+}
+
+.font-pinyon {
+  font-family: var(--font-pinyon-script), cursive;
+}
+
+/* Gold Text Gradient */
+.text-gold-gradient {
+  background: linear-gradient(135deg, #fff3c4 0%, #f3d061 25%, #d4af37 60%, #9e7518 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gold-shimmer {
+  background: linear-gradient(90deg, #d4af37 0%, #fff6d6 50%, #d4af37 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shine 4s linear infinite;
+}
+
+/* Gold Border Glow & Shimmer */
+.border-gold-glow {
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.15), inset 0 0 15px rgba(212, 175, 55, 0.08);
+}
+
+.gold-glass {
+  background: rgba(32, 4, 8, 0.72);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(251, 238, 164, 0.2);
+}
+
+/* Keyframes */
+@keyframes shine {
+  to {
+    background-position: 200% center;
+  }
+}
+
+@keyframes floatGentle {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(1deg);
+  }
+}
+
+@keyframes pulseGold {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+.animate-float {
+  animation: floatGentle 5s ease-in-out infinite;
+}
+
+.animate-pulse-gold {
+  animation: pulseGold 2.5s ease-in-out infinite;
+}
+
+/* Hide scrollbar for clean mobile feel */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
