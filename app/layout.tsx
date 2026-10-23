@@ -29,8 +29,8 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "Royal Wedding Invitation | Cordially Invited",
-  description: "Join us in celebrating the auspicious union of two souls. An unforgettable royal celebration.",
+  title: "Khadija's Marriage Invitation",
+  description: "You are cordially invited to celebrate the marriage of Khadija & Sohaib at Dubai Palace Marque.",
 };
 
 export default function RootLayout({
