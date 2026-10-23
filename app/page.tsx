@@ -84,6 +84,11 @@ export default function WeddingInvitation() {
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [copied, setCopied] = useState(false);
   
+  // Page 2 animation triggers
+  const [page2InView, setPage2InView] = useState(false);
+  const [flowersAnimated, setFlowersAnimated] = useState(false);
+  const [textAnimated, setTextAnimated] = useState(false);
+  
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const heroRef = useRef<HTMLDivElement | null>(null);
   const pinnedTrackRef = useRef<HTMLDivElement | null>(null);
@@ -170,6 +175,50 @@ export default function WeddingInvitation() {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+
+  // Observe Page 2 to trigger the flower bloom and text appearance sequence
+  useEffect(() => {
+    const pinnedEl = pinnedTrackRef.current;
+    if (!pinnedEl) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setPage2InView(true);
+          } else if (entry.boundingClientRect.top > (typeof window !== "undefined" ? window.innerHeight * 0.5 : 400)) {
+            // Reset when user scrolls back to the top video screen
+            setPage2InView(false);
+            setFlowersAnimated(false);
+            setTextAnimated(false);
+          }
+        });
+      },
+      { threshold: 0.15 }
+    );
+
+    observer.observe(pinnedEl);
+
+    return () => observer.disconnect();
+  }, []);
+
+  // Sequence the animation: Flowers slide & bloom in, then text reveals
+  useEffect(() => {
+    if (page2InView) {
+      const flowerTimer = setTimeout(() => {
+        setFlowersAnimated(true);
+      }, 150);
+
+      const textTimer = setTimeout(() => {
+        setTextAnimated(true);
+      }, 1150);
+
+      return () => {
+        clearTimeout(flowerTimer);
+        clearTimeout(textTimer);
+      };
+    }
+  }, [page2InView]);
 
   const jumpToStep = (index: number) => {
     if (!pinnedTrackRef.current) return;
@@ -263,8 +312,8 @@ export default function WeddingInvitation() {
               <span className="h-[1px] w-10 sm:w-14 bg-gradient-to-l from-transparent to-[#d4af37]" />
             </div>
 
-            {/* Main Greeting in Pinyon Script */}
-            <h1 className="font-pinyon text-6xl sm:text-7xl md:text-8xl text-gold-gradient py-1 drop-shadow-[0_4px_18px_rgba(0,0,0,0.95)] leading-tight text-center">
+            {/* Main Greeting in Pinyon Script - Strictly on one line for all phone screens */}
+            <h1 className="font-pinyon text-[clamp(2.1rem,9.5vw,4.25rem)] whitespace-nowrap text-gold-gradient py-1 drop-shadow-[0_4px_18px_rgba(0,0,0,0.95)] leading-tight text-center max-w-full">
               Happy Marriage
             </h1>
           </div>
@@ -284,201 +333,155 @@ export default function WeddingInvitation() {
         </section>
 
         {/* ========================================================
-            SCREEN 2: PINNED STEP-BY-STEP SECTION
-            The background & frame stay fixed in viewport while each scroll
-            smoothly animates the decorative elements & transitions the text!
+            SCREEN 2: LUXURY EMBOSSED INVITATION CARD
+            - Cream embossed 3D damask frame background
+            - Top-right & bottom-left burgundy flowers bloom in from corners
+            - Center text gracefully appears after the floral entrance
            ======================================================== */}
         <section
           ref={pinnedTrackRef}
           id="pinned-invitation"
-          className="relative w-full h-[400vh]"
+          className="relative w-full min-h-[100dvh] overflow-hidden flex flex-col justify-between p-6 select-none"
         >
-          {/* Sticky Viewport Stage (Pinned at top: 0, height: 100dvh) */}
-          <div className="sticky top-0 h-[100dvh] w-full overflow-hidden flex flex-col justify-between p-5 bg-[#200408]">
-            
-            {/* Rich Royal Background Layers */}
-            <div className="absolute inset-0 bg-radial from-[#5c0f1c]/40 via-[#200408] to-[#120104] pointer-events-none" />
-            
-            {/* Ambient Animated Gold Glows */}
-            <div className="absolute top-1/4 -left-20 w-56 h-56 bg-[#d4af37]/10 rounded-full blur-3xl pointer-events-none animate-pulse-gold" />
-            <div className="absolute bottom-1/4 -right-20 w-56 h-56 bg-[#fae084]/10 rounded-full blur-3xl pointer-events-none animate-pulse-gold" />
+          {/* Background: 3D Embossed Cream & Ivory Carved Lace Frame */}
+          <div
+            className="absolute inset-0 bg-cover bg-center pointer-events-none z-0"
+            style={{ backgroundImage: "url('/images/page2-bg.jpg')" }}
+          />
 
-            {/* Pinned Royal Arch & Floral Ornament Container */}
-            <div className="absolute inset-3 border border-[#d4af37]/35 rounded-3xl pointer-events-none flex flex-col justify-between p-4">
-              {/* Corner Ornaments */}
-              <div className="flex justify-between w-full">
-                <svg className="w-8 h-8 text-[#d4af37]/60" viewBox="0 0 40 40" fill="currentColor">
-                  <path d="M0,0 L18,0 C12,6 6,12 0,18 Z M0,2 C6,8 10,14 14,20 C8,16 2,12 0,6 Z" />
-                </svg>
-                <svg className="w-8 h-8 text-[#d4af37]/60 transform rotate-90" viewBox="0 0 40 40" fill="currentColor">
-                  <path d="M0,0 L18,0 C12,6 6,12 0,18 Z M0,2 C6,8 10,14 14,20 C8,16 2,12 0,6 Z" />
-                </svg>
-              </div>
+          {/* Subtle warm ambient lighting overlay */}
+          <div className="absolute inset-0 bg-amber-50/15 pointer-events-none z-1" />
 
-              {/* Central Background Animated Mandala / Sacred Geometry */}
-              <div
-                className="w-48 h-48 mx-auto opacity-15 transition-transform duration-1000 ease-out pointer-events-none"
+          {/* Top-Right Flower & Berry Garland - Slides & Blooms In from Corner */}
+          <div
+            className={`absolute top-0 right-0 w-full pointer-events-none z-10 transition-all duration-1000 ${
+              flowersAnimated
+                ? "opacity-100 translate-x-0 translate-y-0 scale-100 rotate-0"
+                : "opacity-0 translate-x-20 -translate-y-20 scale-85 rotate-12"
+            }`}
+            style={{ transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}
+          >
+            <img
+              src="/images/flower-top.png"
+              alt="Burgundy Velvet Flower Top Corner"
+              className="w-full h-auto object-contain drop-shadow-[0_16px_28px_rgba(74,14,23,0.35)]"
+            />
+          </div>
+
+          {/* Bottom-Left Flower & Berry Garland - Slides & Blooms In from Corner */}
+          <div
+            className={`absolute bottom-0 left-0 w-full pointer-events-none z-10 transition-all duration-1000 ${
+              flowersAnimated
+                ? "opacity-100 translate-x-0 translate-y-0 scale-100 rotate-0"
+                : "opacity-0 -translate-x-20 translate-y-20 scale-85 -rotate-12"
+            }`}
+            style={{ transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}
+          >
+            <img
+              src="/images/flower-bottom.png"
+              alt="Burgundy Velvet Flower Bottom Corner"
+              className="w-full h-auto object-contain drop-shadow-[0_-16px_28px_rgba(74,14,23,0.35)]"
+            />
+          </div>
+
+          {/* Invisible Spacer Top for Floral Clearance */}
+          <div className="h-16 w-full pointer-events-none z-20" />
+
+          {/* Center Text Area - Each line animates in with its own staggered sequence */}
+          <div className="relative z-20 my-auto px-4 max-w-sm mx-auto flex flex-col items-center text-center">
+            
+            {/* Top Invitation Header - Tightly grouped */}
+            <div className="mb-4 flex flex-col items-center">
+              {/* Line 1: You Are */}
+              <p
+                className={`font-body text-xl sm:text-2xl text-[#1a0205] font-medium tracking-wide leading-none transition-all duration-700 ease-out ${
+                  textAnimated
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 -translate-y-4"
+                }`}
+                style={{ transitionDelay: textAnimated ? "850ms" : "0ms" }}
+              >
+                You Are
+              </p>
+
+              {/* Line 2: Invited On Our Wedding */}
+              <p
+                className={`font-body text-xl sm:text-2xl text-[#1a0205] font-medium tracking-wide leading-none mt-1 sm:mt-1.5 transition-all duration-700 ease-out ${
+                  textAnimated
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 -translate-y-4"
+                }`}
+                style={{ transitionDelay: textAnimated ? "1100ms" : "0ms" }}
+              >
+                Invited On Our Wedding
+              </p>
+            </div>
+
+            {/* Prominent Stacked Couple Names - Tightly stacked with no gap */}
+            <div className="flex flex-col items-center my-3 select-none">
+              {/* Line 3: KHADIJA */}
+              <h2
+                className={`text-5xl sm:text-6xl md:text-7xl text-[#140103] leading-[0.88] uppercase tracking-tight transition-all duration-800 ease-out ${
+                  textAnimated
+                    ? "opacity-100 scale-100 translate-y-0"
+                    : "opacity-0 scale-90 translate-y-3"
+                }`}
                 style={{
-                  transform: `rotate(${currentStep * 45}deg) scale(${1 + (currentStep % 2) * 0.1})`,
+                  fontFamily: "'Times New Roman', 'TimesNewRomanPS-BoldMT', Georgia, serif",
+                  fontWeight: 900,
+                  transitionDelay: textAnimated ? "1400ms" : "0ms",
                 }}
               >
-                <svg viewBox="0 0 100 100" className="w-full h-full text-[#d4af37]" fill="none" stroke="currentColor" strokeWidth="0.8">
-                  <circle cx="50" cy="50" r="45" strokeDasharray="3 3" />
-                  <circle cx="50" cy="50" r="35" />
-                  <circle cx="50" cy="50" r="22" strokeDasharray="2 2" />
-                  <polygon points="50,15 62,38 85,50 62,62 50,85 38,62 15,50 38,38" />
-                  <polygon points="50,22 58,42 78,50 58,58 50,78 42,58 22,50 42,42" strokeDasharray="1 2" />
-                </svg>
-              </div>
+                KHADIJA
+              </h2>
 
-              <div className="flex justify-between w-full">
-                <svg className="w-8 h-8 text-[#d4af37]/60 transform -rotate-90" viewBox="0 0 40 40" fill="currentColor">
-                  <path d="M0,0 L18,0 C12,6 6,12 0,18 Z M0,2 C6,8 10,14 14,20 C8,16 2,12 0,6 Z" />
-                </svg>
-                <svg className="w-8 h-8 text-[#d4af37]/60 transform rotate-180" viewBox="0 0 40 40" fill="currentColor">
-                  <path d="M0,0 L18,0 C12,6 6,12 0,18 Z M0,2 C6,8 10,14 14,20 C8,16 2,12 0,6 Z" />
-                </svg>
-              </div>
-            </div>
-
-            {/* Pinned Top Bar: Step Progress Indicator & Chapter */}
-            <div className="relative z-20 flex items-center justify-between pt-2 px-2">
-              <span className="font-royal text-[11px] tracking-[0.25em] text-[#fae084] uppercase">
-                {currentEvent.tag}
-              </span>
-
-              {/* Step Dots (Clickable to smoothly advance) */}
-              <div className="flex items-center gap-1.5 bg-[#200408]/80 px-2.5 py-1 rounded-full border border-[#d4af37]/30 backdrop-blur-md">
-                {EVENTS.map((ev, idx) => (
-                  <button
-                    key={ev.id}
-                    onClick={() => jumpToStep(idx)}
-                    aria-label={`Jump to ${ev.tag}`}
-                    className={`transition-all duration-300 rounded-full ${
-                      currentStep === idx
-                        ? "w-6 h-1.5 bg-gradient-to-r from-[#fae084] to-[#d4af37]"
-                        : "w-1.5 h-1.5 bg-[#d4af37]/30 hover:bg-[#d4af37]/60"
-                    }`}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Center Animated Element & Text Stage */}
-            <div className="relative z-20 my-auto px-3 flex flex-col items-center text-center">
-              
-              {/* Step Animated Icon Motif (Re-animates on step change) */}
-              <div
-                key={`icon-${currentStep}`}
-                className="w-16 h-16 rounded-full flex items-center justify-center bg-gradient-to-b from-[#420812] to-[#200408] border border-[#d4af37]/60 shadow-[0_0_25px_rgba(212,175,55,0.25)] mb-4 animate-float"
+              {/* Line 4: &SOHAIB */}
+              <h2
+                className={`text-5xl sm:text-6xl md:text-7xl text-[#140103] leading-[0.88] uppercase tracking-tight -mt-1 sm:-mt-2 transition-all duration-800 ease-out ${
+                  textAnimated
+                    ? "opacity-100 scale-100 translate-y-0"
+                    : "opacity-0 scale-90 translate-y-3"
+                }`}
+                style={{
+                  fontFamily: "'Times New Roman', 'TimesNewRomanPS-BoldMT', Georgia, serif",
+                  fontWeight: 900,
+                  transitionDelay: textAnimated ? "1700ms" : "0ms",
+                }}
               >
-                <span className="text-2xl">{currentEvent.accentIcon}</span>
-              </div>
-
-              {/* Step Text Block with Staggered Transition */}
-              <div
-                key={`content-${currentStep}`}
-                className="w-full transition-all duration-700 ease-out transform translate-y-0 opacity-100"
-              >
-                <p className="font-script text-2xl sm:text-3xl text-[#fbeea4] mb-1">
-                  {currentEvent.subtitle}
-                </p>
-
-                <h3 className="font-royal text-2xl sm:text-3xl text-gold-gradient font-semibold tracking-wide uppercase mb-3">
-                  {currentEvent.title}
-                </h3>
-
-                <div className="w-14 h-[1px] bg-[#d4af37]/50 mx-auto mb-4" />
-
-                {/* Glassmorphic Details Card */}
-                <div className="gold-glass rounded-2xl p-4 sm:p-5 text-left flex flex-col gap-3 shadow-xl">
-                  <p className="font-body text-xs sm:text-sm text-[#faf6ee]/90 leading-relaxed text-center italic">
-                    "{currentEvent.description}"
-                  </p>
-
-                  <div className="grid grid-cols-2 gap-2 pt-2 border-t border-[#d4af37]/20">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="w-3.5 h-3.5 text-[#fae084] shrink-0" />
-                      <div>
-                        <p className="text-[10px] text-[#fae084]/70 uppercase font-royal tracking-wider">Date</p>
-                        <p className="text-[11px] text-[#faf6ee] font-medium">{currentEvent.date}</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <Clock className="w-3.5 h-3.5 text-[#fae084] shrink-0" />
-                      <div>
-                        <p className="text-[10px] text-[#fae084]/70 uppercase font-royal tracking-wider">Time</p>
-                        <p className="text-[11px] text-[#faf6ee] font-medium">{currentEvent.time}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-2 pt-1 border-t border-[#d4af37]/20">
-                    <MapPin className="w-3.5 h-3.5 text-[#fae084] shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-[10px] text-[#fae084]/70 uppercase font-royal tracking-wider">Venue</p>
-                      <p className="text-[11px] text-[#faf6ee] font-medium leading-snug">{currentEvent.venue}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Interactive Action for Step 4 (Share / Direction) */}
-                {currentStep === EVENTS.length - 1 && (
-                  <div className="mt-4 flex items-center justify-center gap-3">
-                    <button
-                      onClick={handleShare}
-                      className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-[#d4af37] to-[#b89128] text-[#200408] font-royal text-xs uppercase tracking-wider font-semibold shadow-lg active:scale-95 transition-transform"
-                    >
-                      {copied ? (
-                        <>
-                          <CheckCircle2 className="w-3.5 h-3.5" />
-                          Copied Link
-                        </>
-                      ) : (
-                        <>
-                          <Share2 className="w-3.5 h-3.5" />
-                          Share Invitation
-                        </>
-                      )}
-                    </button>
-
-                    <a
-                      href="https://maps.google.com"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-1.5 px-4 py-2 rounded-full border border-[#d4af37]/60 bg-[#200408]/80 text-[#fae084] font-royal text-xs uppercase tracking-wider hover:bg-[#d4af37]/20 active:scale-95 transition-transform"
-                    >
-                      <Compass className="w-3.5 h-3.5" />
-                      Directions
-                    </a>
-                  </div>
-                )}
-              </div>
+                &amp;SOHAIB
+              </h2>
             </div>
 
-            {/* Pinned Bottom Footer Navigation */}
-            <div className="relative z-20 pb-2 px-2 flex items-center justify-between text-[#fae084]/80 text-[10px] font-royal tracking-widest uppercase">
-              <span>Step {currentStep + 1} of {EVENTS.length}</span>
+            {/* Time & Venue Lines */}
+            <div className="flex flex-col items-center gap-1.5 my-4">
+              {/* Line 5: 1'clock Afternoon */}
+              <p
+                className={`font-body text-lg sm:text-xl text-[#1a0205] font-semibold leading-relaxed transition-all duration-600 ease-out ${
+                  textAnimated
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 translate-y-3"
+                }`}
+                style={{ transitionDelay: textAnimated ? "2000ms" : "0ms" }}
+              >
+                1&apos;clock Afternoon
+              </p>
 
-              {currentStep < EVENTS.length - 1 ? (
-                <button
-                  onClick={() => jumpToStep(currentStep + 1)}
-                  className="flex items-center gap-1 hover:text-white transition-colors cursor-pointer"
-                >
-                  <span>Scroll for more</span>
-                  <ChevronDown className="w-3 h-3 animate-bounce" />
-                </button>
-              ) : (
-                <button
-                  onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-                  className="hover:text-white transition-colors cursor-pointer"
-                >
-                  Back to Top ↑
-                </button>
-              )}
+              {/* Line 6: Dubai Palace Marque */}
+              <p
+                className={`font-body text-lg sm:text-xl text-[#1a0205] font-semibold leading-relaxed transition-all duration-600 ease-out ${
+                  textAnimated
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 translate-y-3"
+                }`}
+                style={{ transitionDelay: textAnimated ? "2250ms" : "0ms" }}
+              >
+                Dubai Palace Marque
+              </p>
             </div>
           </div>
+
+          {/* Bottom Invisible Spacer for Flower Clearance */}
+          <div className="h-16 w-full pointer-events-none z-20" />
         </section>
 
       </div>
