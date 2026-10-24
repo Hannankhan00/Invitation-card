@@ -209,16 +209,16 @@ export default function WeddingInvitation() {
     return () => observer.disconnect();
   }, []);
 
-  // Sequence the animation: Flowers slide & bloom in, then text reveals
+  // Sequence the animation: Flowers slide & bloom in, then text reveals promptly
   useEffect(() => {
     if (page2InView) {
       const flowerTimer = setTimeout(() => {
         setFlowersAnimated(true);
-      }, 150);
+      }, 50);
 
       const textTimer = setTimeout(() => {
         setTextAnimated(true);
-      }, 1150);
+      }, 200);
 
       return () => {
         clearTimeout(flowerTimer);
@@ -282,7 +282,6 @@ export default function WeddingInvitation() {
             className="absolute inset-0 w-full h-full object-cover z-0"
           >
             <source src="/video/intro.webm" type="video/webm" />
-            <source src="/video/intro.mp4" type="video/mp4" />
           </video>
 
           {/* Luxury Vignette & Maroon Gradient Overlays - Center kept transparent so hands shine */}
@@ -422,19 +421,19 @@ export default function WeddingInvitation() {
                 {/* Top Invitation Header */}
                 <div className="mb-4 flex flex-col items-center">
                   <p
-                    className={`font-body text-xl sm:text-2xl text-[#1a0205] font-medium tracking-wide leading-none transition-all duration-700 ease-out ${
-                      textAnimated ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"
+                    className={`font-body text-xl sm:text-2xl text-[#1a0205] font-medium tracking-wide leading-none transition-all duration-500 ease-out ${
+                      textAnimated ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-3"
                     }`}
-                    style={{ transitionDelay: textAnimated ? "850ms" : "0ms" }}
+                    style={{ transitionDelay: textAnimated ? "80ms" : "0ms" }}
                   >
                     You Are
                   </p>
 
                   <p
-                    className={`font-body text-xl sm:text-2xl text-[#1a0205] font-medium tracking-wide leading-none mt-1 sm:mt-1.5 transition-all duration-700 ease-out ${
-                      textAnimated ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"
+                    className={`font-body text-xl sm:text-2xl text-[#1a0205] font-medium tracking-wide leading-none mt-1 sm:mt-1.5 transition-all duration-500 ease-out ${
+                      textAnimated ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-3"
                     }`}
-                    style={{ transitionDelay: textAnimated ? "1100ms" : "0ms" }}
+                    style={{ transitionDelay: textAnimated ? "180ms" : "0ms" }}
                   >
                     Invited On Our Wedding
                   </p>
@@ -443,26 +442,26 @@ export default function WeddingInvitation() {
                 {/* Prominent Stacked Couple Names */}
                 <div className="flex flex-col items-center my-3 select-none">
                   <h2
-                    className={`text-5xl sm:text-6xl md:text-7xl text-[#140103] leading-[0.88] uppercase tracking-tight transition-all duration-800 ease-out ${
-                      textAnimated ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-90 translate-y-3"
+                    className={`text-5xl sm:text-6xl md:text-7xl text-[#140103] leading-[0.88] uppercase tracking-tight transition-all duration-600 ease-out ${
+                      textAnimated ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 translate-y-2"
                     }`}
                     style={{
                       fontFamily: "'Times New Roman', 'TimesNewRomanPS-BoldMT', Georgia, serif",
                       fontWeight: 900,
-                      transitionDelay: textAnimated ? "1400ms" : "0ms",
+                      transitionDelay: textAnimated ? "280ms" : "0ms",
                     }}
                   >
                     KHADIJA
                   </h2>
 
                   <h2
-                    className={`text-5xl sm:text-6xl md:text-7xl text-[#140103] leading-[0.88] uppercase tracking-tight -mt-1 sm:-mt-2 transition-all duration-800 ease-out ${
-                      textAnimated ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-90 translate-y-3"
+                    className={`text-5xl sm:text-6xl md:text-7xl text-[#140103] leading-[0.88] uppercase tracking-tight -mt-1 sm:-mt-2 transition-all duration-600 ease-out ${
+                      textAnimated ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 translate-y-2"
                     }`}
                     style={{
                       fontFamily: "'Times New Roman', 'TimesNewRomanPS-BoldMT', Georgia, serif",
                       fontWeight: 900,
-                      transitionDelay: textAnimated ? "1700ms" : "0ms",
+                      transitionDelay: textAnimated ? "380ms" : "0ms",
                     }}
                   >
                     &amp;SOHAIB
@@ -472,19 +471,19 @@ export default function WeddingInvitation() {
                 {/* Time & Venue Lines */}
                 <div className="flex flex-col items-center gap-1.5 my-4">
                   <p
-                    className={`font-body text-lg sm:text-xl text-[#1a0205] font-semibold leading-relaxed transition-all duration-600 ease-out ${
-                      textAnimated ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
+                    className={`font-body text-lg sm:text-xl text-[#1a0205] font-semibold leading-relaxed transition-all duration-500 ease-out ${
+                      textAnimated ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
                     }`}
-                    style={{ transitionDelay: textAnimated ? "2000ms" : "0ms" }}
+                    style={{ transitionDelay: textAnimated ? "500ms" : "0ms" }}
                   >
                     1&apos;clock Afternoon
                   </p>
 
                   <p
-                    className={`font-body text-lg sm:text-xl text-[#1a0205] font-semibold leading-relaxed transition-all duration-600 ease-out ${
-                      textAnimated ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
+                    className={`font-body text-lg sm:text-xl text-[#1a0205] font-semibold leading-relaxed transition-all duration-500 ease-out ${
+                      textAnimated ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
                     }`}
-                    style={{ transitionDelay: textAnimated ? "2250ms" : "0ms" }}
+                    style={{ transitionDelay: textAnimated ? "620ms" : "0ms" }}
                   >
                     Dubai Palace Marque
                   </p>
