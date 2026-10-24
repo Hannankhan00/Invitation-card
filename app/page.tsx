@@ -272,14 +272,18 @@ export default function WeddingInvitation() {
           {/* Background Video */}
           <video
             ref={videoRef}
-            src="/video/intro.mp4"
             autoPlay
             loop
             muted={isMuted}
             playsInline
+            preload="auto"
+            poster="/images/poster.jpg"
             onLoadedData={() => setVideoLoaded(true)}
             className="absolute inset-0 w-full h-full object-cover z-0"
-          />
+          >
+            <source src="/video/intro.webm" type="video/webm" />
+            <source src="/video/intro.mp4" type="video/mp4" />
+          </video>
 
           {/* Luxury Vignette & Maroon Gradient Overlays - Center kept transparent so hands shine */}
           <div className="absolute inset-0 bg-gradient-to-b from-[#200408]/40 via-transparent to-[#200408]/95 z-10 pointer-events-none" />

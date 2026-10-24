@@ -43,6 +43,10 @@ export default function RootLayout({
       lang="en"
       className={`${cinzel.variable} ${greatVibes.variable} ${pinyonScript.variable} ${montserrat.variable} h-full antialiased scroll-smooth`}
     >
+      <head>
+        <link rel="preload" href="/images/poster.jpg" as="image" />
+        <link rel="preload" href="/video/intro.webm" as="video" type="video/webm" />
+      </head>
       <body className="min-h-full bg-[#1e0307] text-[#FAF6EE] overflow-x-hidden selection:bg-[#d4af37] selection:text-[#2b040a]">
         {children}
       </body>
