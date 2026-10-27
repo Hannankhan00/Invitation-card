@@ -1,9 +1,17 @@
 import type { Metadata } from "next";
-import { Cinzel, Great_Vibes, Montserrat, Pinyon_Script } from "next/font/google";
+import { Cinzel, Great_Vibes, Montserrat, Pinyon_Script, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 
 const cinzel = Cinzel({
   variable: "--font-cinzel",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const cormorant = Cormorant_Garamond({
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  variable: "--font-cormorant",
   subsets: ["latin"],
   display: "swap",
 });
@@ -29,8 +37,8 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "Khadija's Marriage Invitation",
-  description: "You are cordially invited to celebrate the marriage of Khadija & Sohaib at Dubai Palace Marque.",
+  title: "Wedding Invitation | Khadija Mansoor & Sohaib Javed",
+  description: "Mr. & Mrs. Mansoor cordially invite you to celebrate the wedding of Khadija Mansoor & Sohaib Javed at Dubai Palace Marque.",
 };
 
 export default function RootLayout({
@@ -41,7 +49,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${cinzel.variable} ${greatVibes.variable} ${pinyonScript.variable} ${montserrat.variable} h-full antialiased scroll-smooth`}
+      className={`${cinzel.variable} ${cormorant.variable} ${greatVibes.variable} ${pinyonScript.variable} ${montserrat.variable} h-full antialiased scroll-smooth`}
     >
       <head>
         <link rel="preload" href="/images/poster.jpg" as="image" />

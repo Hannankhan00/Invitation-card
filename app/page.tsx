@@ -33,9 +33,9 @@ const EVENTS: EventDetail[] = [
     tag: "AUSPICIOUS UNION",
     title: "Welcome to Our Wedding",
     subtitle: "In the name of Love, Grace & Family",
-    time: "Dec 18, 2026",
-    date: "Friday Evening",
-    venue: "The Grand Regal Palace",
+    time: "1:30 PM (After Jummah)",
+    date: "Friday, Nov 13, 2026",
+    venue: "Dubai Palace Marque",
     description:
       "Together with our parents, we warmly invite you and your family to witness and celebrate the sacred union of two loving souls.",
     accentIcon: "✨",
@@ -43,25 +43,25 @@ const EVENTS: EventDetail[] = [
   {
     id: 2,
     tag: "THE COUPLE",
-    title: "Aarav & Meera",
+    title: "Khadija Mansoor & Sohaib Javed",
     subtitle: "Two souls, one eternal beginning",
-    time: "Blessed Together",
-    date: "Forever & Always",
-    venue: "Daughter of Mr. & Mrs. Sharma • Son of Mr. & Mrs. Verma",
+    time: "1:30 PM (After Jummah)",
+    date: "Friday, Nov 13, 2026",
+    venue: "Dubai Palace Marque",
     description:
-      "As our story unfolds into a lifetime of shared laughter and dreams, your presence and blessings will make our special day complete.",
+      "As our story unfolds into a lifetime of shared laughter and dreams, your presence and prayers will make our special day complete.",
     accentIcon: "💍",
   },
   {
     id: 3,
     tag: "CEREMONIES",
-    title: "Varmala & Pheras",
-    subtitle: "Holy Matrimony & Grand Reception",
-    time: "06:30 PM Onwards",
-    date: "Friday, Dec 18, 2026",
-    venue: "Royal Courtyard, Udaipur",
+    title: "Wedding Reception",
+    subtitle: "Celebration & Banquet Feast",
+    time: "01:30 PM (After Jummah)",
+    date: "Friday, Nov 13, 2026",
+    venue: "Dubai Palace Marque",
     description:
-      "Followed by an evening of music, banquet dinner, and timeless memories under the starlit sky.",
+      "Followed by an afternoon of prayers, luncheon banquet, and timeless memories surrounded by loved ones.",
     accentIcon: "🪷",
   },
   {
@@ -70,8 +70,8 @@ const EVENTS: EventDetail[] = [
     title: "Join The Festivities",
     subtitle: "We Can't Wait To See You",
     time: "RSVP & Venue Directions",
-    date: "Location Guide",
-    venue: "The Grand Regal Palace, Lake Pichola",
+    date: "Friday, Nov 13, 2026",
+    venue: "Dubai Palace Marque",
     description:
       "Kindly consider this as our heartfelt personal invitation. Click below to view directions or save the date to your calendar.",
     accentIcon: "💌",
@@ -79,7 +79,7 @@ const EVENTS: EventDetail[] = [
 ];
 
 export default function WeddingInvitation() {
-  const [isMuted, setIsMuted] = useState(true);
+  const [isMuted, setIsMuted] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -93,6 +93,7 @@ export default function WeddingInvitation() {
   const heroRef = useRef<HTMLDivElement | null>(null);
   const pinnedTrackRef = useRef<HTMLDivElement | null>(null);
   const touchStartY = useRef<number>(0);
+  const userExplicitlyMuted = useRef<boolean>(false);
 
   // Toggle Video Mute/Unmute
   const toggleAudio = (e?: React.MouseEvent) => {
@@ -101,10 +102,49 @@ export default function WeddingInvitation() {
     const newMuted = !videoRef.current.muted;
     videoRef.current.muted = newMuted;
     setIsMuted(newMuted);
-    if (!newMuted) {
+    if (newMuted) {
+      userExplicitlyMuted.current = true;
+    } else {
+      userExplicitlyMuted.current = false;
       videoRef.current.play().catch(() => {});
     }
   };
+
+  // Enable audio by default on video load with automatic interaction unlock
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    video.muted = false;
+    const playPromise = video.play();
+
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => {
+          setIsMuted(false);
+        })
+        .catch(() => {
+          // If browser restricts unmuted autoplay before user interaction,
+          // play muted initially and automatically unmute on the first user tap/click.
+          video.muted = true;
+          setIsMuted(true);
+          video.play().catch(() => {});
+
+          const unlockAudio = () => {
+            if (!userExplicitlyMuted.current && videoRef.current) {
+              videoRef.current.muted = false;
+              setIsMuted(false);
+              videoRef.current.play().catch(() => {});
+            }
+            window.removeEventListener("click", unlockAudio);
+            window.removeEventListener("touchstart", unlockAudio);
+          };
+
+          window.addEventListener("click", unlockAudio, { passive: true });
+          window.addEventListener("touchstart", unlockAudio, { passive: true });
+        });
+    }
+  }, []);
 
   // Auto-scroll from hero to pinned section on first scroll/swipe
   const scrollToPinnedSection = () => {
@@ -161,17 +201,9 @@ export default function WeddingInvitation() {
       const progress = Math.max(0, Math.min(1, scrolled / totalTrackHeight));
       
       // Step distribution across progress [0 -> 1]:
-      // 0.00 .. 0.28 -> Step 0 (The Invitation)
-      // 0.28 .. 0.65 -> Step 1 (Save The Date)
-      // 0.65 .. 1.00 -> Step 2 (Thank You & Good Wishes)
-      let stepIndex = 0;
-      if (progress >= 0.65) {
-        stepIndex = 2;
-      } else if (progress >= 0.28) {
-        stepIndex = 1;
-      } else {
-        stepIndex = 0;
-      }
+      // 0.00 .. 0.45 -> Step 0 (The Invitation)
+      // 0.45 .. 1.00 -> Step 1 (Thank You & Good Wishes)
+      const stepIndex = progress >= 0.45 ? 1 : 0;
       setCurrentStep(stepIndex);
     };
 
@@ -230,9 +262,7 @@ export default function WeddingInvitation() {
   const jumpToStep = (index: number) => {
     if (!pinnedTrackRef.current) return;
     const totalTrackHeight = pinnedTrackRef.current.offsetHeight - window.innerHeight;
-    let ratio = 0;
-    if (index === 1) ratio = 0.46;
-    else if (index === 2) ratio = 0.92;
+    const ratio = index === 1 ? 0.75 : 0;
     const targetScroll = pinnedTrackRef.current.offsetTop + (totalTrackHeight * ratio);
     window.scrollTo({
       top: targetScroll,
@@ -243,8 +273,8 @@ export default function WeddingInvitation() {
   const handleShare = () => {
     if (navigator.share) {
       navigator.share({
-        title: "Khadija's Marriage Invitation | Khadija & Sohaib",
-        text: "You are cordially invited to celebrate the marriage of Khadija & Sohaib at Dubai Palace Marque on March 26, 2026!",
+        title: "Wedding Invitation | Khadija Mansoor & Sohaib Javed",
+        text: "Mr. & Mrs. Mansoor cordially invite you to celebrate the wedding of Khadija Mansoor & Sohaib Javed at Dubai Palace Marque on Friday, November 13, 2026 at 1:30 PM (After Jummah)!",
         url: window.location.href,
       }).catch(() => {});
     } else {
@@ -346,17 +376,16 @@ export default function WeddingInvitation() {
         </section>
 
         {/* ========================================================
-            SCREEN 2, 3 & 4: LUXURY EMBOSSED PINNED TRACK
+            SCREEN 2 & 3: LUXURY EMBOSSED PINNED TRACK
             - Pinned 3D damask frame & velvet burgundy flowers
             - Scrolling down smoothly transitions between:
               Card 0: The Invitation Card (Khadija & Sohaib)
-              Card 1: Save The Date Card (26 MARCH 2026 lockup)
-              Card 2: Thank You Card (Gratitude & Beautiful Reading)
+              Card 1: Thank You Card (Gratitude & Beautiful Reading)
            ======================================================== */}
         <section
           ref={pinnedTrackRef}
           id="pinned-invitation"
-          className="relative w-full h-[320vh] select-none"
+          className="relative w-full h-[220vh] select-none"
         >
           {/* Sticky Viewport Stage - Keeps background and floral frames completely fixed */}
           <div className="sticky top-0 h-[100dvh] w-full overflow-hidden flex flex-col justify-between p-6">
@@ -419,71 +448,80 @@ export default function WeddingInvitation() {
                 }`}
               >
                 {/* Top Invitation Header */}
-                <div className="mb-4 flex flex-col items-center">
+                <div className="mb-2.5 sm:mb-3 flex flex-col items-center">
                   <p
-                    className={`font-body text-xl sm:text-2xl text-[#1a0205] font-medium tracking-wide leading-none transition-all duration-500 ease-out ${
+                    className={`font-body text-lg sm:text-xl text-[#1a0205] font-bold tracking-wide leading-tight transition-all duration-500 ease-out ${
                       textAnimated ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-3"
                     }`}
                     style={{ transitionDelay: textAnimated ? "80ms" : "0ms" }}
                   >
-                    You Are
+                    Mr. &amp; Mrs. Mansoor
                   </p>
 
                   <p
-                    className={`font-body text-xl sm:text-2xl text-[#1a0205] font-medium tracking-wide leading-none mt-1 sm:mt-1.5 transition-all duration-500 ease-out ${
+                    className={`font-body text-sm sm:text-base text-[#38070e] font-medium tracking-wide leading-snug mt-1 max-w-[290px] sm:max-w-xs transition-all duration-500 ease-out ${
                       textAnimated ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-3"
                     }`}
                     style={{ transitionDelay: textAnimated ? "180ms" : "0ms" }}
                   >
-                    Invited On Our Wedding
+                    cordially invite you to the wedding of
                   </p>
                 </div>
 
                 {/* Prominent Stacked Couple Names */}
-                <div className="flex flex-col items-center my-3 select-none">
+                <div className="flex flex-col items-center my-2 select-none px-1 w-full max-w-[350px] mx-auto">
                   <h2
-                    className={`text-5xl sm:text-6xl md:text-7xl text-[#140103] leading-[0.88] uppercase tracking-tight transition-all duration-600 ease-out ${
+                    className={`font-royal text-[clamp(1.68rem,6.8vw,2.45rem)] font-extrabold text-[#140103] leading-[0.98] uppercase tracking-[0.025em] transition-all duration-600 ease-out whitespace-nowrap text-center ${
                       textAnimated ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 translate-y-2"
                     }`}
                     style={{
-                      fontFamily: "'Times New Roman', 'TimesNewRomanPS-BoldMT', Georgia, serif",
-                      fontWeight: 900,
+                      fontWeight: 800,
+                      WebkitTextStroke: "0.35px #140103",
                       transitionDelay: textAnimated ? "280ms" : "0ms",
                     }}
                   >
-                    KHADIJA
+                    KHADIJA MANSOOR
                   </h2>
 
                   <h2
-                    className={`text-5xl sm:text-6xl md:text-7xl text-[#140103] leading-[0.88] uppercase tracking-tight -mt-1 sm:-mt-2 transition-all duration-600 ease-out ${
+                    className={`font-royal text-[clamp(1.68rem,6.8vw,2.45rem)] font-extrabold text-[#140103] leading-[0.98] uppercase tracking-[0.025em] mt-0.5 transition-all duration-600 ease-out whitespace-nowrap text-center ${
                       textAnimated ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 translate-y-2"
                     }`}
                     style={{
-                      fontFamily: "'Times New Roman', 'TimesNewRomanPS-BoldMT', Georgia, serif",
-                      fontWeight: 900,
+                      fontWeight: 800,
+                      WebkitTextStroke: "0.35px #140103",
                       transitionDelay: textAnimated ? "380ms" : "0ms",
                     }}
                   >
-                    &amp;SOHAIB
+                    &amp; SOHAIB JAVED
                   </h2>
                 </div>
 
-                {/* Time & Venue Lines */}
-                <div className="flex flex-col items-center gap-1.5 my-4">
+                {/* Date, Time & Venue Lines */}
+                <div className="flex flex-col items-center gap-1.5 my-3 sm:my-4">
                   <p
-                    className={`font-body text-lg sm:text-xl text-[#1a0205] font-semibold leading-relaxed transition-all duration-500 ease-out ${
+                    className={`font-body text-base sm:text-lg text-[#1a0205] font-bold tracking-wide transition-all duration-500 ease-out ${
                       textAnimated ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
                     }`}
                     style={{ transitionDelay: textAnimated ? "500ms" : "0ms" }}
                   >
-                    1&apos;clock Afternoon
+                    Friday, 13 November 2026
                   </p>
 
                   <p
-                    className={`font-body text-lg sm:text-xl text-[#1a0205] font-semibold leading-relaxed transition-all duration-500 ease-out ${
+                    className={`font-body text-base sm:text-lg text-[#1a0205] font-semibold tracking-wide transition-all duration-500 ease-out ${
                       textAnimated ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
                     }`}
-                    style={{ transitionDelay: textAnimated ? "620ms" : "0ms" }}
+                    style={{ transitionDelay: textAnimated ? "580ms" : "0ms" }}
+                  >
+                    1:30 PM (After Jummah)
+                  </p>
+
+                  <p
+                    className={`font-body text-base sm:text-lg text-[#1a0205] font-bold tracking-wide transition-all duration-500 ease-out ${
+                      textAnimated ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
+                    }`}
+                    style={{ transitionDelay: textAnimated ? "660ms" : "0ms" }}
                   >
                     Dubai Palace Marque
                   </p>
@@ -491,120 +529,11 @@ export default function WeddingInvitation() {
               </div>
 
               {/* ----------------------------------------------------
-                  CARD 1: SAVE THE DATE (MATCHING REFERENCE IMAGE)
-                 ---------------------------------------------------- */}
-              <div
-                className={`absolute inset-0 flex flex-col items-center justify-center text-center transition-all duration-700 ease-out ${
-                  currentStep === 1
-                    ? "opacity-100 translate-y-0 pointer-events-auto scale-100"
-                    : currentStep > 1
-                    ? "opacity-0 -translate-y-8 pointer-events-none scale-95"
-                    : "opacity-0 translate-y-8 pointer-events-none scale-95"
-                }`}
-              >
-                {/* Header Tag */}
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="h-[1px] w-8 bg-[#8b1e2e]/50" />
-                  <span className="font-royal text-[11px] sm:text-xs uppercase tracking-[0.3em] text-[#5c0f1c] font-semibold">
-                    Khadija &amp; Sohaib
-                  </span>
-                  <span className="h-[1px] w-8 bg-[#8b1e2e]/50" />
-                </div>
-
-                {/* Main "SAVE THE DATE 26 MARCH 2026" Typographic Lockup */}
-                <div className="flex items-center justify-center gap-5 sm:gap-7 my-2 text-[#140103] drop-shadow-[0_2px_4px_rgba(0,0,0,0.06)]">
-                  {/* Left Column: Stacked SAVE / THE / DATE in Bold Italic Serif */}
-                  <div className="flex flex-col items-start text-left leading-[0.82] select-none">
-                    <span
-                      className="text-[2.2rem] sm:text-[2.85rem] font-black italic tracking-tighter"
-                      style={{ fontFamily: "'Times New Roman', 'TimesNewRomanPS-BoldItalicMT', Georgia, serif" }}
-                    >
-                      SAVE
-                    </span>
-                    <span
-                      className="text-[2.75rem] sm:text-[3.5rem] font-black italic tracking-tight -my-1 sm:-my-1.5"
-                      style={{ fontFamily: "'Times New Roman', 'TimesNewRomanPS-BoldItalicMT', Georgia, serif" }}
-                    >
-                      THE
-                    </span>
-                    <span
-                      className="text-[2.2rem] sm:text-[2.85rem] font-black italic tracking-tighter"
-                      style={{ fontFamily: "'Times New Roman', 'TimesNewRomanPS-BoldItalicMT', Georgia, serif" }}
-                    >
-                      DATE
-                    </span>
-                  </div>
-
-                  {/* Right Column: 26 / MARCH / 2026 in Bold Italic Serif */}
-                  <div className="flex flex-col items-center text-center select-none">
-                    <span
-                      className="text-[5.4rem] sm:text-[6.8rem] font-black italic leading-[0.72] tracking-tighter"
-                      style={{ fontFamily: "'Times New Roman', 'TimesNewRomanPS-BoldItalicMT', Georgia, serif" }}
-                    >
-                      26
-                    </span>
-                    <span
-                      className="text-[1.25rem] sm:text-[1.55rem] font-black italic uppercase tracking-wider leading-none mt-1 sm:mt-1.5"
-                      style={{ fontFamily: "'Times New Roman', 'TimesNewRomanPS-BoldItalicMT', Georgia, serif" }}
-                    >
-                      MARCH
-                    </span>
-                    <span
-                      className="text-[1.25rem] sm:text-[1.55rem] font-black italic tracking-wider leading-none mt-0.5"
-                      style={{ fontFamily: "'Times New Roman', 'TimesNewRomanPS-BoldItalicMT', Georgia, serif" }}
-                    >
-                      2026
-                    </span>
-                  </div>
-                </div>
-
-                {/* Subtitle / Venue Information */}
-                <div className="flex flex-col items-center gap-1 my-3 text-[#1a0205]">
-                  <p className="font-body text-base sm:text-lg font-semibold tracking-wide">
-                    1&apos;clock Afternoon
-                  </p>
-                  <p className="font-body text-base sm:text-lg font-bold tracking-wide">
-                    Dubai Palace Marque
-                  </p>
-                </div>
-
-                {/* Action Buttons: Add To Calendar & Share */}
-                <div className="flex items-center gap-2.5 mt-2">
-                  <a
-                    href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Wedding+of+Khadija+%26+Sohaib&dates=20260326T080000Z/20260326T140000Z&details=You+are+cordially+invited+to+celebrate+the+wedding+of+Khadija+%26+Sohaib+at+Dubai+Palace+Marque.&location=Dubai+Palace+Marque"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#38070e] text-[#fbeea4] text-xs font-semibold tracking-wider uppercase border border-[#d4af37]/40 shadow hover:bg-[#520a14] active:scale-95 transition-all"
-                  >
-                    <Calendar className="w-3.5 h-3.5 text-[#fae084]" />
-                    <span>Add To Calendar</span>
-                  </a>
-
-                  <button
-                    onClick={handleShare}
-                    className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#f8f1df] text-[#38070e] text-xs font-semibold tracking-wider uppercase border border-[#38070e]/30 shadow hover:bg-[#f1e6ce] active:scale-95 transition-all"
-                  >
-                    {copied ? (
-                      <>
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
-                        <span>Link Copied</span>
-                      </>
-                    ) : (
-                      <>
-                        <Share2 className="w-3.5 h-3.5 text-[#38070e]" />
-                        <span>Share</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              {/* ----------------------------------------------------
-                  CARD 2: THANK YOU & BEAUTIFUL WISHES / READING
+                  CARD 1: THANK YOU & BEAUTIFUL WISHES / READING
                  ---------------------------------------------------- */}
               <div
                 className={`absolute inset-0 flex flex-col items-center justify-center text-center px-2 transition-all duration-700 ease-out ${
-                  currentStep === 2
+                  currentStep === 1
                     ? "opacity-100 translate-y-0 pointer-events-auto scale-100"
                     : "opacity-0 translate-y-8 pointer-events-none scale-95"
                 }`}
@@ -618,9 +547,15 @@ export default function WeddingInvitation() {
                   <span className="h-[1px] w-6 sm:w-8 bg-[#8b1e2e]/50" />
                 </div>
 
-                {/* Main Calligraphy Header: Thank You */}
-                <h2 className="font-pinyon text-5xl sm:text-6xl text-[#140103] leading-none my-1 drop-shadow-sm select-none">
-                  Thank You
+                {/* Main Header: Thank You in Cinzel font matching couple names */}
+                <h2
+                  className="font-royal text-2xl sm:text-3xl md:text-[2rem] font-extrabold text-[#140103] leading-tight uppercase tracking-[0.08em] my-1 select-none"
+                  style={{
+                    fontWeight: 800,
+                    WebkitTextStroke: "0.35px #140103",
+                  }}
+                >
+                  THANK YOU
                 </h2>
 
                 {/* Delicate Divider Ornament */}
@@ -631,46 +566,23 @@ export default function WeddingInvitation() {
                 </div>
 
                 {/* Meaningful & Inspiring Reading */}
-                <div className="max-w-[320px] sm:max-w-xs mx-auto my-1 flex flex-col gap-1.5 select-none">
-                  <p className="font-body text-[13px] sm:text-[14.5px] text-[#240308] leading-relaxed font-semibold">
+                <div className="max-w-[320px] sm:max-w-xs mx-auto my-3 flex flex-col gap-1.5 select-none">
+                  <p className="font-body text-[14px] sm:text-[15.5px] text-[#240308] leading-relaxed font-semibold">
                     Your presence, warm blessings, and prayers are the greatest gift as we begin our new journey together.
                   </p>
-                  <p className="font-body text-[12px] sm:text-[13px] text-[#420812] leading-relaxed italic opacity-95">
-                    &ldquo;Two lives, two hearts, joined together in friendship, united forever in love.&rdquo;
-                  </p>
                 </div>
 
-                {/* Sign-off / Signature */}
-                <div className="mt-2 flex flex-col items-center select-none">
-                  <p className="font-pinyon text-2xl sm:text-3xl text-[#5c0f1c] leading-none">
-                    Khadija &amp; Sohaib
-                  </p>
-                  <p className="font-royal text-[10px] uppercase tracking-[0.22em] text-[#8b1e2e] mt-1 font-semibold">
-                    &amp; Families
-                  </p>
-                </div>
-
-                {/* Interactive Action Buttons */}
-                <div className="flex items-center gap-2 mt-3">
+                {/* Interactive Action Button: Venue Location in Maroon matching the flowers */}
+                <div className="flex items-center justify-center mt-4">
                   <a
                     href="https://maps.google.com/?q=Dubai+Palace+Marque"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#38070e] text-[#fbeea4] text-[11px] font-semibold tracking-wider uppercase border border-[#d4af37]/40 shadow hover:bg-[#520a14] active:scale-95 transition-all"
+                    className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#4a0e17] hover:bg-[#5c0f1c] text-[#fbeea4] text-xs font-semibold tracking-widest uppercase border border-[#d4af37]/50 shadow-[0_4px_16px_rgba(74,14,23,0.45)] active:scale-95 transition-all"
                   >
-                    <MapPin className="w-3.5 h-3.5 text-[#fae084]" />
+                    <MapPin className="w-4 h-4 text-[#fae084]" />
                     <span>Venue Location</span>
                   </a>
-
-                  <button
-                    onClick={() => {
-                      window.scrollTo({ top: 0, behavior: "smooth" });
-                    }}
-                    className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#f8f1df] text-[#38070e] text-[11px] font-semibold tracking-wider uppercase border border-[#38070e]/30 shadow hover:bg-[#f1e6ce] active:scale-95 transition-all"
-                  >
-                    <Sparkles className="w-3.5 h-3.5 text-[#a67c1e]" />
-                    <span>Back To Top</span>
-                  </button>
                 </div>
               </div>
 
@@ -683,7 +595,7 @@ export default function WeddingInvitation() {
                   onClick={() => jumpToStep(1)}
                   className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#200408]/85 border border-[#d4af37]/50 text-[#fae084] shadow-lg active:scale-95 hover:bg-[#38070e] transition-all text-xs tracking-wider uppercase font-medium backdrop-blur-sm cursor-pointer"
                 >
-                  <span>Save The Date</span>
+                  <span>Thank You</span>
                   <ChevronDown className="w-3.5 h-3.5 text-[#fae084] animate-bounce" />
                 </button>
               )}
@@ -697,26 +609,10 @@ export default function WeddingInvitation() {
                     <span>↑ Invitation</span>
                   </button>
                   <button
-                    onClick={() => jumpToStep(2)}
-                    className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#38070e] border border-[#d4af37]/60 text-[#fbeea4] shadow-lg active:scale-95 hover:bg-[#520a14] transition-all text-[11px] tracking-wider uppercase font-semibold backdrop-blur-sm cursor-pointer"
-                  >
-                    <span>Thank You</span>
-                    <ChevronDown className="w-3 h-3 text-[#fae084] animate-bounce" />
-                  </button>
-                </div>
-              )}
-
-              {currentStep === 2 && (
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => jumpToStep(1)}
-                    className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#200408]/85 border border-[#d4af37]/40 text-[#fae084] shadow-md active:scale-95 hover:bg-[#38070e] transition-all text-[11px] tracking-wider uppercase font-medium backdrop-blur-sm cursor-pointer"
-                  >
-                    <span>↑ Save The Date</span>
-                  </button>
-                  <button
-                    onClick={() => jumpToStep(0)}
-                    className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#200408]/85 border border-[#d4af37]/40 text-[#fae084] shadow-md active:scale-95 hover:bg-[#38070e] transition-all text-[11px] tracking-wider uppercase font-medium backdrop-blur-sm cursor-pointer"
+                    onClick={() => {
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                    className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#38070e] border border-[#d4af37]/60 text-[#fbeea4] shadow-lg active:scale-95 hover:bg-[#520a14] transition-all text-[11px] tracking-wider uppercase font-semibold backdrop-blur-sm cursor-pointer"
                   >
                     <span>↑ Start</span>
                   </button>

@@ -43,6 +43,10 @@ body {
   font-family: var(--font-pinyon-script), cursive;
 }
 
+.font-cormorant {
+  font-family: var(--font-cormorant), Georgia, serif;
+}
+
 /* Gold Text Gradient */
 .text-gold-gradient {
   background: linear-gradient(135deg, #fff3c4 0%, #f3d061 25%, #d4af37 60%, #9e7518 100%);
