@@ -88,6 +88,7 @@ export default function WeddingInvitation() {
   
   const containerRef = useRef<HTMLDivElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const heroRef = useRef<HTMLDivElement | null>(null);
   const invitationRef = useRef<HTMLDivElement | null>(null);
   const thankyouRef = useRef<HTMLDivElement | null>(null);
@@ -98,28 +99,35 @@ export default function WeddingInvitation() {
   const lastWheelTime = useRef<number>(0);
   const userExplicitlyMuted = useRef<boolean>(false);
 
-  // Toggle Video Mute/Unmute
+  // Toggle Background Audio Mute/Unmute
   const toggleAudio = (e?: React.MouseEvent) => {
     e?.stopPropagation();
-    if (!videoRef.current) return;
-    const newMuted = !videoRef.current.muted;
-    videoRef.current.muted = newMuted;
-    setIsMuted(newMuted);
-    if (newMuted) {
-      userExplicitlyMuted.current = true;
-    } else {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    if (audio.paused || audio.muted || isMuted) {
+      audio.muted = false;
+      audio.play().catch(() => {});
+      setIsMuted(false);
       userExplicitlyMuted.current = false;
-      videoRef.current.play().catch(() => {});
+    } else {
+      audio.muted = true;
+      setIsMuted(true);
+      userExplicitlyMuted.current = true;
     }
   };
 
-  // Enable audio by default on video load with automatic interaction unlock
+  // Video remains permanently muted. Background audio handles the music.
   useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
+    if (videoRef.current) {
+      videoRef.current.muted = true;
+    }
 
-    video.muted = false;
-    const playPromise = video.play();
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    audio.muted = false;
+    const playPromise = audio.play();
 
     if (playPromise !== undefined) {
       playPromise
@@ -129,15 +137,17 @@ export default function WeddingInvitation() {
         .catch(() => {
           // If browser restricts unmuted autoplay before user interaction,
           // play muted initially and automatically unmute on the first user tap/click.
-          video.muted = true;
           setIsMuted(true);
-          video.play().catch(() => {});
 
           const unlockAudio = () => {
-            if (!userExplicitlyMuted.current && videoRef.current) {
-              videoRef.current.muted = false;
-              setIsMuted(false);
-              videoRef.current.play().catch(() => {});
+            if (!userExplicitlyMuted.current && audioRef.current) {
+              audioRef.current.muted = false;
+              audioRef.current
+                .play()
+                .then(() => {
+                  setIsMuted(false);
+                })
+                .catch(() => {});
             }
             window.removeEventListener("click", unlockAudio);
             window.removeEventListener("touchstart", unlockAudio);
@@ -250,6 +260,17 @@ export default function WeddingInvitation() {
 
   return (
     <div className="relative w-full h-[100dvh] bg-[#200408] text-[#faf6ee] flex justify-center overflow-hidden select-none">
+      {/* Background Music Audio Element - Continuous playback across all pages */}
+      <audio
+        ref={audioRef}
+        loop
+        preload="auto"
+      >
+        <source src="/audio/background-music.webm" type="audio/webm" />
+        <source src="/audio/background-music.m4a" type="audio/mp4" />
+        <source src="/audio/background-music.mp3" type="audio/mpeg" />
+      </audio>
+
       {/* Mobile-first centered container with gesture interception */}
       <div
         ref={containerRef}
@@ -275,12 +296,12 @@ export default function WeddingInvitation() {
           className="relative w-full h-[100dvh] shrink-0 overflow-hidden flex flex-col justify-between items-center text-center select-none snap-start snap-always"
           style={{ scrollSnapAlign: "start", scrollSnapStop: "always" }}
         >
-          {/* Background Video */}
+          {/* Background Video - Permanently muted */}
           <video
             ref={videoRef}
             autoPlay
             loop
-            muted={isMuted}
+            muted
             playsInline
             preload="auto"
             poster="/images/poster.jpg"
@@ -306,7 +327,7 @@ export default function WeddingInvitation() {
           <header className="relative z-30 w-full pt-6 px-6 flex items-center justify-end">
             <button
               onClick={toggleAudio}
-              aria-label={isMuted ? "Unmute audio" : "Mute audio"}
+              aria-label={isMuted ? "Unmute music" : "Mute music"}
               className="w-10 h-10 rounded-full flex items-center justify-center bg-[#200408]/70 border border-[#d4af37]/50 text-[#fbeea4] shadow-lg active:scale-95 transition-transform"
             >
               {isMuted ? (
