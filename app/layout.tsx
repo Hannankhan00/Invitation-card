@@ -37,8 +37,8 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "Wedding Invitation | Khadija Mansoor & Sohaib Javed",
-  description: "Mr. & Mrs. Mansoor cordially invite you to celebrate the wedding of Khadija Mansoor & Sohaib Javed at Dubai Palace Marque.",
+  title: "Nikkah Invitation | Khadija Mansoor & Sohaib Javed",
+  description: "Mr. & Mrs. Mansoor cordially invite you to celebrate the nikkah of Khadija Mansoor & Sohaib Javed at Dubai Palace Marque.",
 };
 
 export default function RootLayout({

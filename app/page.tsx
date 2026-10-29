@@ -31,7 +31,7 @@ const EVENTS: EventDetail[] = [
   {
     id: 1,
     tag: "AUSPICIOUS UNION",
-    title: "Welcome to Our Wedding",
+    title: "Welcome to Our Nikkah",
     subtitle: "In the name of Love, Grace & Family",
     time: "1:30 PM (After Jummah)",
     date: "Friday, Nov 13, 2026",
@@ -55,7 +55,7 @@ const EVENTS: EventDetail[] = [
   {
     id: 3,
     tag: "CEREMONIES",
-    title: "Wedding Reception",
+    title: "Nikkah Ceremony & Reception",
     subtitle: "Celebration & Banquet Feast",
     time: "01:30 PM (After Jummah)",
     date: "Friday, Nov 13, 2026",
@@ -444,7 +444,7 @@ export default function WeddingInvitation() {
                 }`}
                 style={{ transitionDelay: textAnimated ? "180ms" : "0ms" }}
               >
-                cordially invite you to the wedding of
+                cordially invite you to the nikkah of
               </p>
             </div>
 
