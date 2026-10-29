@@ -479,32 +479,35 @@ export default function WeddingInvitation() {
 
             {/* Date, Time & Venue Lines */}
             <div className="flex flex-col items-center gap-1.5 my-3 sm:my-4">
-              <p
-                className={`font-body text-base sm:text-lg text-[#1a0205] font-bold tracking-wide transition-all duration-500 ease-out ${
+              <div
+                className={`flex items-center gap-2 font-body text-base sm:text-lg text-[#1a0205] font-bold tracking-wide transition-all duration-500 ease-out drop-shadow-[0_1px_2px_rgba(255,255,255,0.85)] ${
                   textAnimated ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
                 }`}
                 style={{ transitionDelay: textAnimated ? "500ms" : "0ms" }}
               >
-                Friday, 13 November 2026
-              </p>
+                <Calendar className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-[#731320] shrink-0" />
+                <span>Friday, 13 November 2026</span>
+              </div>
 
-              <p
-                className={`font-body text-base sm:text-lg text-[#1a0205] font-semibold tracking-wide transition-all duration-500 ease-out ${
+              <div
+                className={`flex items-center gap-2 font-body text-base sm:text-lg text-[#1a0205] font-semibold tracking-wide transition-all duration-500 ease-out drop-shadow-[0_1px_2px_rgba(255,255,255,0.85)] ${
                   textAnimated ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
                 }`}
                 style={{ transitionDelay: textAnimated ? "580ms" : "0ms" }}
               >
-                1:30 PM (After Jummah)
-              </p>
+                <Clock className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-[#731320] shrink-0" />
+                <span>1:30 PM (After Jummah)</span>
+              </div>
 
-              <p
-                className={`font-body text-base sm:text-lg text-[#1a0205] font-bold tracking-wide transition-all duration-500 ease-out ${
+              <div
+                className={`flex items-center gap-2 font-body text-base sm:text-lg text-[#1a0205] font-bold tracking-wide transition-all duration-500 ease-out drop-shadow-[0_1px_2px_rgba(255,255,255,0.85)] ${
                   textAnimated ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
                 }`}
                 style={{ transitionDelay: textAnimated ? "660ms" : "0ms" }}
               >
-                Dubai Palace Marque
-              </p>
+                <MapPin className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-[#731320] shrink-0" />
+                <span>Dubai Palace Marque</span>
+              </div>
             </div>
           </div>
 
